@@ -1,0 +1,96 @@
+# 核心配置文件
+spring:
+  datasource:  #数据库有关信息
+    url: jdbc:mysql://localhost:3306/program  # 数据库地址，包含数据库开放的端口和数据库名称
+    username: root  # 登入数据库的账户
+    password: 123456  # 登入数据库的密码
+    type: com.alibaba.druid.pool.DruidDataSource   # 数据源类型
+    druid:  #druid目的是为了数据库连得快、稳、不容易崩,下面的配置都是数据库连接的配置
+      initial-size: 5    # 初始化大小
+      min-idle: 10   # 最小连接数
+      max-active: 20   # 最大连接数
+      max-wait: 60000   # 获取连接的最大等待时间（毫秒）
+      validation-query: SELECT 1
+      test-on-borrow: true
+      test-while-idle: true
+      test-on-return: false
+
+  application:
+    name: demo
+
+server:
+  port: 8081
+  servlet:  #添加统一访问前缀，为了区分项目，我存在多个项目这个是管理员登陆系统项目
+    context-path: /vaeee
+
+# springdoc-openapi项目配置,接口文档配置项
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      #接口在controller下所以配置controller包
+      packages-to-scan: com.example.demo.controller
+
+# knife4j的增强配置，不需要增强可以不配
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+    swagger-model-name: 实体类列表
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    #把 MyBatis 执行的 SQL 打印到控制台
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  #用于为实体类设置别名，简化 Mapper XML 中的类名引用。
+  type-aliases-package: com.example.demo.entity
+
+# 文件上传配置项
+file:
+  server:
+      #文件保存目录
+      dir: E:\vaeee\file
+      #访问静态资源的前缀
+      path: upload
+
+
+
+#SA-Token配置项
+sa-token:
+    # Token名称（同时也是cookie名称）
+    #Sa-Token只认这个
+    #👉 它只会去找：
+    #Header: vaeeetoken
+    #或 URL: ?vaeeetoken=xxx
+    #或 Cookie: vaeeetoken
+    token-name: vaeeetoken
+    # Token有效时间（秒）30天,-1表示永久
+    token-timeout: 259200
+    # Token最低活跃频率（秒），如果Token超过该时间没有访问系统的操作就会被冻结，-1表示不冻结
+    active-timeout: -1
+    # 是否允许同一账号多设备登录（true表示允许一起登录，false表示新登录挤掉旧登陆）
+    is-concurrent: true
+    # 在多人登录同一账号时，是否共用一个token（true表示共用，false表示每次登录新建一个token）
+    is-share: true
+    # Token风格（默认可取值：uuid，simple-uuid，random-32，random-64，random-128，tik）
+    token-style: uuid
+    # 是否输出Sa-Token的日志
+    is-log: true
+
+#调试配置项
+logging:
+  level:
+    com.github.xiaoymin.knife4j: DEBUG
+    io.swagger.v3: DEBUG
+    org.springdoc: DEBUG
+
+
+
+
+

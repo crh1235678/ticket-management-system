@@ -1,0 +1,20 @@
+<script setup lang="ts">
+import { RouterLink, RouterView } from 'vue-router'
+
+</script>
+
+<template>
+  <header>
+
+    <div class="wrapper">
+
+    </div>
+  </header>
+
+  <!-- 路由占位符 -->
+  <RouterView />
+</template>
+
+<style scoped>
+
+</style>

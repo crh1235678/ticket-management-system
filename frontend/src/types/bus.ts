@@ -1,0 +1,12 @@
+export interface BusUserVO {
+    // 记录自身id为了订单记录服务
+    id: number
+    busNumber: string
+    busName: string
+    origin: string
+    destination: string
+    departureTime: string
+    arrivalTime: string
+    price: number
+    seatRemaining: number
+}

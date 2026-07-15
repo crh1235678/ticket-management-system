@@ -1,0 +1,37 @@
+# ========== Java ==========
+target/
+*.class
+*.jar
+*.war
+*.log
+
+# ========== Maven ==========
+!mvnw
+!mvnw.cmd
+
+# ========== Node ==========
+node_modules/
+dist/
+*.tsbuildinfo
+
+# ========== IDE ==========
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+
+# ========== OS ==========
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# ========== Env ==========
+.env.local
+.env.*.local
+
+# ========== Upload ==========
+uploads/

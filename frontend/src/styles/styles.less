@@ -1,0 +1,277 @@
+//导入变量样式
+@import url(var.less);
+
+//全局样式清除默认边距和内边距
+// ==========================================================================
+// 全局重置样式
+// ==========================================================================
+* {
+    margin: 0;
+    padding: 0;
+}
+
+// 链接样式 - 移除下划线装饰
+a {
+    text-decoration: none;
+}
+
+// 页面主体样式 - 设置滚动条和右边距
+body {
+    overflow-y: auto !important;
+    padding-right: 0 !important;
+}
+
+// ===============================================================================================================
+// 全局通用样式类
+// ==================================================================================================================
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    color: @headertitle;
+}
+// 文本溢出显示省略号
+.overflowShow{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.layout-main {
+  padding: 0;
+  overflow-x: hidden; 
+}
+
+// ==========================================================================
+// 前台页面样式 (Front)
+// ==========================================================================
+.front-body {
+    width: 100%;
+
+    .front-body-hero {
+        height: 487.5px;
+        width: 100%;
+        display: flex;
+        padding-top: 50px;
+
+        .hero-left {
+            height: 100%;
+            flex: 4;
+            padding-left: 3%;
+            display: flex;
+        }
+        .hero-right {
+            height: 100%;
+            flex: 6;
+            padding: 0 3%;
+
+        }
+    }
+
+    .front-body-transport {
+        height: auto;
+        width: 100%;
+
+        .transport-wrapper { 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 80%;
+            margin: 20px auto;
+
+            img {
+                height: 100px;
+                width: 100px;
+                margin: 0 10px;
+            }
+        }
+    }
+
+}
+
+
+
+
+
+
+
+// ==========================================================================
+// 后台管理页面样式 (Admin)
+// ==========================================================================
+//后台管理顶部菜单相关样式
+.header {
+    width: 100%;
+    height: 90px;
+    padding: 0 20px;
+    position: fixed;
+    z-index: 11;
+    left: 0;
+    top: 0;
+    //使用了var.less中的变量样式
+    background: @header;
+}
+
+.header-left {
+    height: 100%;
+    width: 350px;
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+}
+
+
+.header-menu {
+    position: relative;
+    list-style: none;
+    height: @header--menu-height;
+}
+
+.header-logo {
+    float: left;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.header-title {
+    color: @headertitle;
+    height: 33px;
+    line-height: 33px;
+    font-size: @header--title-size;
+    vertical-align: middle;
+    font-weight: bold;
+    font-family: "Arial", "Microsoft YaHei", "黑体", "宋体", sans-serif;
+    margin-left: 10px;
+}
+
+.header-rinfo {
+    margin-right: 60px;
+    float: right;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    color: #ffffff;
+
+    //less特有的嵌套
+    //实际表到效果为 :.header-rinfo a{}
+    a {
+        cursor: pointer;
+        color: #ffffff;
+    }
+}
+
+.header-exit {
+    margin-left: 20px;
+}
+
+
+//左侧菜单栏相关样式
+.vaeee-sidebar {
+    position: fixed;
+    top: 90px;
+    left: 0;
+    bottom: 0;
+    z-index: 1000;
+    width: @vaeee--sidebar-width;
+    overflow: hidden;
+
+    //less中&这是拼接符号,表示当前选择器的父选择器
+    //所以这个表示的实际效果为.vaeee-sidebar--dark{
+    //}
+    //less中&表示当前选择器的父选择器
+    /**
+     * 暗色主题样式
+     * 包含两种暗色变体：--dark 和 --dark-popper
+     * 针对菜单项、子菜单等元素设置相应的暗色背景和文字颜色
+     */
+    &--dark,
+    &--dark-popper {
+        background-color: @sidebar--background-color-dark;
+
+        .vaeee-sidebar_menu.el-menu,
+        >.el-menu--popup {
+            background-color: @sidebar--background-color-dark;
+
+            .el-menu-item,
+            .el-submenu>.el-submenu__title {
+                color: @sidebar--color-text-dark;
+
+                &:focus,
+                &:hover {
+                    color: mix(#fff, @sidebar--color-text-dark, 50%);
+                    background-color: mix(#fff, @sidebar--background-color-dark, 5.5%);
+                }
+            }
+
+            .el-menu,
+            .el-submenu.is-opened {
+                background-color: mix(#000, @sidebar--background-color-dark, 20%);
+            }
+
+            .el-menu-item.is-active,
+            .el-submenu.is-active>.el-submenu__title {
+                color: mix(#fff, @sidebar--color-text-dark, 70%);
+            }
+        }
+    }
+
+    /**
+     * 侧边栏内部容器样式
+     * 设置相对定位、滚动条和内边距
+     */
+    &__inner {
+        position: relative;
+        z-index: 1;
+        width: 250px;
+        height: 100%;
+        padding-bottom: 15px;
+        overflow-y: scroll;
+    }
+
+    &__menu.el-menu {
+        width: @vaeee--sidebar-width;
+        border-right: 0;
+    }
+
+    &__menu-icon {
+        width: 24px;
+        margin-right: 5px;
+        text-align: center;
+        font-size: 16px;
+        color: inherit !important;
+    }
+}
+
+// 菜单项字体样式设置
+.el-sub-menu__title,
+.el-menu-item {
+    font-size: @sidebar--menu--title-size;
+    font-weight: bold;
+}
+
+// 主内容区域样式
+.vaeee-content {
+    position: relative;
+    padding: 15px;
+    background: #f5f5f5;
+
+    &__wrapper {
+        position: relative;
+        width: 100%;
+        margin-left: @vaeee--sidebar-width;
+        min-height: 100%;
+    }
+}
+
+// ==========================================================================
+// 底部版权样式
+// ==========================================================================
+.layout-footer {
+    position: relative;
+    width: 100%;
+    padding: 7px 0px;
+    display: flex;
+    justify-content: center;
+    color: rgba(0, 0, 0, 0.88);
+    font-size: 14px;
+    height: 30px;
+    background: #f5f5f5;
+}

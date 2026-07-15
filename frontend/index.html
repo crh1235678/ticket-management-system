@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/logo.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 从环境变量中获取标题。%%是专门去找.env的变量放入 -->
+    <title>%VITE_APP_TITLE%</title>
+  </head>
+  <body>
+    <div id="app"></div>
+<!-- 
+  引入 main.ts 作为 Vue 应用的入口文件
+  main.ts 创建 Vue 应用并引入 App 根组件
+  同时注册路由（router），将应用挂载到 #app
+  页面根据路由地址的不同，在 App 中通过 <router-view /> 显示对应组件
+-->
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
