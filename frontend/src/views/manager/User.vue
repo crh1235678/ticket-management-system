@@ -86,7 +86,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { getFileUrl } from '@/utils/utils'
 import addOrUpdate from '@/components/AddorUpdate.vue'
 import type { Field } from '@/types/form'
-import { C } from 'vue-router/dist/router-CWoNjPRp.mjs'
+
 
 // 定义表单字段
 const userFields: Field[] = [

@@ -18,7 +18,7 @@ import com.example.demo.VO.user.LoginUserVO;
 import com.example.demo.VO.user.UserVO;
 import com.example.demo.common.exception.BussinessException;
 import com.example.demo.common.result.ResultCode;
-import com.example.demo.common.util.CaptchaCache;
+import com.example.demo.common.util.RedisCaptchaCache;
 import com.example.demo.entity.Admin;
 import com.example.demo.entity.User;
 import com.example.demo.mapper.AdminMapper;
@@ -52,7 +52,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     @Resource
     private AdminMapper adminMapper;
     @Resource
-    private CaptchaCache captchaCache;
+    private RedisCaptchaCache captchaCache;
 
     @Override
     @Transactional

@@ -31,6 +31,7 @@ import com.example.demo.mapper.UserMapper;
 import com.example.demo.service.OrderService;
 import com.example.demo.service.UserService;
 import com.example.demo.service.cache.TransportCache;
+import com.example.demo.common.util.RedisTransportCache;
 import com.example.demo.service.inner.OrderInnerService;
 import com.example.demo.strategy.transport.TransportStrategy;
 import com.example.demo.strategy.transport.TransportStrategyManager;
@@ -59,6 +60,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Resource
     private TransportStrategyManager strategyManager;
 
+    @Resource
+    private RedisTransportCache redisTransportCache;
 
 
     //=========================公共业务逻辑方法====================================================================
@@ -73,10 +76,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // System.out.println("crh"+dto.getTicketType()+dto.getTicketId());
         BaseTransport transport = transportFactory.getTransport(dto.getTransportType(), dto.getTransportId());
         if (transport == null) {
-            throw new BussinessException(ResultCode.PARAM_ERROR, dto.getTransportType() + "票不存在");
+            throw new BussinessException(ResultCode.PARAM_ERROR, dto.getTransportType() + "绁ㄤ笉瀛樺湪");
         }
 
-        // 调用内部事务创建并保存订单, 主要目的是为了让事务一致性, 回滚事务做到统一
+        // 调用内部事务创建并保存订单，主要目的是为了让事务一致性，回滚事务做到统一
         Order order = orderInnerService.createOrderInner(transport, dto, userId);
 
         // 5️⃣ 返回订单信息
@@ -93,15 +96,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public void cancelOrder(Long orderId) {
-        // 1️⃣ 获取当前登录用户,查看该用户是否拥有该订单，防止用户恶意传入他人的订单进行修改
+        // 1️⃣ 获取当前登录用户，查看该用户是否拥有该订单，防止用户恶意传入他人的订单进行修改
         Long userId = SaTokenUtil.getLoginUserId();
         // 2️⃣ 查订单，确保订单存在且属于当前用户
         Order order = this.getById(orderId);
         if (order == null) {
-            throw new BussinessException("订单不存在");
+            throw new BussinessException("Order does not exist");
         }
         if (!order.getUserId().equals(userId)) {
-            throw new BussinessException("无权取消他人的订单");
+            throw new BussinessException("No permission to cancel others order");
         }
         // 3️⃣ 检查订单状态，只能取消未支付的订单和已经支付的订单
         if (order.getStatus() == OrderStatus.CANCELLED ) {
@@ -120,25 +123,25 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Override
     @Transactional
     public void refundTicket(Long orderId){
-        // 1️⃣ 获取当前登录用户,查看该用户是否拥有该订单，防止用户恶意传入他人的订单进行修改
+        // 1锔忊儯 鑾峰彇褰撳墠鐧诲綍鐢ㄦ埛,鏌ョ湅璇ョ敤鎴锋槸鍚︽嫢鏈夎璁㈠崟锛岄槻姝㈢敤鎴锋伓鎰忎紶鍏ヤ粬浜虹殑璁㈠崟杩涜淇敼
         Long userId = SaTokenUtil.getLoginUserId();
         User user = userService.getById(userId);
-        // 2️⃣ 查订单，确保订单存在且属于当前用户
+        // 2锔忊儯 鏌ヨ鍗曪紝纭繚璁㈠崟瀛樺湪涓斿睘浜庡綋鍓嶇敤鎴?
         Order order = this.getById(orderId);
         if (order == null) {
-            throw new BussinessException("订单不存在");
+            throw new BussinessException("Order does not exist");
         }
         if (!order.getUserId().equals(userId)) {
-            throw new BussinessException("无权取消他人的订单");
+            throw new BussinessException("No permission to cancel others order");
         }
-        // 3️⃣ 检查订单状态，只能取消未支付的订单和已经支付的订单
+        // 3锔忊儯 妫€鏌ヨ鍗曠姸鎬侊紝鍙兘鍙栨秷鏈敮浠樼殑璁㈠崟鍜屽凡缁忔敮浠樼殑璁㈠崟
         if (order.getStatus() == OrderStatus.CANCELLED ) {
-            throw new BussinessException("订单已取消，无法操作");
+            throw new BussinessException("璁㈠崟宸插彇娑堬紝鏃犳硶鎿嶄綔");
         }
-        // 4️⃣ 获取票对象
+        // 4锔忊儯 鑾峰彇绁ㄥ璞?
         BaseTransport transport = transportFactory.getTransport(order.getTransportType(), order.getTicketId());
         if (transport == null) {
-            throw new BussinessException("对应票不存在");
+            throw new BussinessException("瀵瑰簲绁ㄤ笉瀛樺湪");
         }
         orderInnerService.refundTicketInner(order, transport, user);
     }
@@ -149,10 +152,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         User user = userService.getById(userId);
         Order order = this.getById(orderId);
         if (order == null || !order.getUserId().equals(userId)) {
-            throw new BussinessException(ResultCode.NO_PERMISSION, "订单不存在或无权限操作");
+            throw new BussinessException(ResultCode.NO_PERMISSION, "Order not exist or no permission");
         }
         if (order.getStatus() != OrderStatus.UNPAID) {
-            throw new BussinessException(ResultCode.ORDER_STATUS, "订单状态不可支付");
+            throw new BussinessException(ResultCode.ORDER_STATUS, "Order status not payable");
         }
 
         // 创建充值流水数据体，把数据写入数据库
@@ -183,7 +186,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (strategy != null) {
             return strategy.changeTickets(dto, order);
         }else{
-            throw new BussinessException(ResultCode.ERROR,"不支持改签");
+            throw new BussinessException(ResultCode.ERROR,"Change not supported");
         }
     }
     @Override
@@ -199,7 +202,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
 
         if (oldOrder.getStatus() != OrderStatus.PAID) {
-            throw new BussinessException("只有已支付订单才能改签");
+            throw new BussinessException("Only paid orders can be changed");
         }
 
         BaseTransport transport = transportFactory.getTransport(dto.getTransportType(), dto.getTransportId());
@@ -260,7 +263,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
             for (TransportStrategy strategy : strategyManager.getAll()) {
 
-                // ✅ 只执行匹配的交通类型（核心优化🔥）
+                // 鉁?鍙墽琛屽尮閰嶇殑浜ら€氱被鍨嬶紙鏍稿績浼樺寲馃敟锛?
                 if (StringUtils.isNotBlank(query.getTransportType())
                         && !strategy.getType().name().equals(query.getTransportType())) {
                     continue;
@@ -269,7 +272,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 transportIds.addAll(strategy.queryIds(query));
             }
 
-            // ❗关键：没有结果直接返回空
+            // 鉂楀叧閿細娌℃湁缁撴灉鐩存帴杩斿洖绌?
             if (transportIds.isEmpty()) {
                 return new Page<>(query.getPageNum(), query.getPageSize());
             }
@@ -278,13 +281,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
 
         // =========================
-        // ✅ Order 表筛选
+        // 鉁?Order 琛ㄧ瓫閫?
         // =========================
 
         // 当前用户
         wrapper.eq(Order::getUserId, userId);
 
-        // 限制用户只能看这几种状态，这样做防止用户修改status查看其他信息
+        // 闄愬埗鐢ㄦ埛鍙兘鐪嬭繖鍑犵鐘舵€侊紝杩欐牱鍋氶槻姝㈢敤鎴蜂慨鏀箂tatus鏌ョ湅鍏朵粬淇℃伅
         List<OrderStatus> allowStatus = Arrays.asList(
                 OrderStatus.UNPAID,
                 OrderStatus.PAID
@@ -320,16 +323,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<>();
 
         // 可选筛选
-        // 状态不能模糊，因为就三个状态未支付，已支付，已经取消
+        // 状态不能模糊，因为就三个状态：未支付，已支付，已取消
         wrapper.eq(
                 StringUtils.isNotBlank(query.getStatus()),
-                Order::getStatus, //告诉 MyBatis-Plus “我要操作的是 Admin 实体里的 name 这个字段”，告诉框架“是哪个字段
-                query.getStatus() //告诉 MyBatis-Plus “我要操作的是 Admin 实体里的 name 这个字段”，告诉框架“是哪个字段
+                Order::getStatus, //鍛婅瘔 MyBatis-Plus 鈥滄垜瑕佹搷浣滅殑鏄?Admin 瀹炰綋閲岀殑 name 杩欎釜瀛楁鈥濓紝鍛婅瘔妗嗘灦鈥滄槸鍝釜瀛楁
+                query.getStatus() //鍛婅瘔 MyBatis-Plus 鈥滄垜瑕佹搷浣滅殑鏄?Admin 瀹炰綋閲岀殑 name 杩欎釜瀛楁鈥濓紝鍛婅瘔妗嗘灦鈥滄槸鍝釜瀛楁
         );
         wrapper.like(
                 StringUtils.isNotBlank(query.getTransportType()),
-                Order::getTransportType, //告诉 MyBatis-Plus “我要操作的是 Admin 实体里的 name 这个字段”，告诉框架“是哪个字段
-                query.getTransportType() //告诉 MyBatis-Plus “我要操作的是 Admin 实体里的 name 这个字段”，告诉框架“是哪个字段
+                Order::getTransportType, //鍛婅瘔 MyBatis-Plus 鈥滄垜瑕佹搷浣滅殑鏄?Admin 瀹炰綋閲岀殑 name 杩欎釜瀛楁鈥濓紝鍛婅瘔妗嗘灦鈥滄槸鍝釜瀛楁
+                query.getTransportType() //鍛婅瘔 MyBatis-Plus 鈥滄垜瑕佹搷浣滅殑鏄?Admin 瀹炰綋閲岀殑 name 杩欎釜瀛楁鈥濓紝鍛婅瘔妗嗘灦鈥滄槸鍝釜瀛楁
         );
         wrapper.like(
                 query.getUserId() != null,
@@ -339,7 +342,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         return baseQuery(page, wrapper);
     }
 
-    // 这个优化“解决两个问题：数据库多次查询 + 循环遍历多”
+    // 这个优化"解决两个问题：数据库多次查询 + 循环遍历多"
     // 前者解决就是将一次查询所有都保存下来，而不是在循环里去数据库查找数据，后者就是用hash表解决遍历多的问题
     private IPage<OrderUserVO> baseQuery(Page<Order> page, LambdaQueryWrapper<Order> wrapper) {
 
@@ -353,10 +356,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // =========================
         // 2️⃣ 批量查询用户（一次SQL）
         // =========================
-/*         Stream 把集合转换成一条“数据流”，
-         然后对流中的元素逐个进行流水线式处理,
-         用map函数把order类转换成userid去重，
-         然后用collect将数据流变成新的列表*/
+/*         Stream 鎶婇泦鍚堣浆鎹㈡垚涓€鏉♀€滄暟鎹祦鈥濓紝
+         鐒跺悗瀵规祦涓殑鍏冪礌閫愪釜杩涜娴佹按绾垮紡澶勭悊,
+         鐢╩ap鍑芥暟鎶妎rder绫昏浆鎹㈡垚userid鍘婚噸锛?
+         鐒跺悗鐢╟ollect灏嗘暟鎹祦鍙樻垚鏂扮殑鍒楄〃*/
         List<Long> userIds = orders.stream()
                 .map(Order::getUserId)
                 .distinct()
@@ -371,13 +374,26 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
 
         // =========================
-        // 3️⃣ 批量查询佳通（一次SQL）
+        // 3️⃣ 批量查询交通（一次SQL）
         // 构建票务缓存
         // =========================
         TransportCache cache = new TransportCache();
 
         for (TransportStrategy strategy : strategyManager.getAll()) {
             strategy.buildCache(orderPage.getRecords(), cache);
+        }
+
+        // =========================
+        // 🌟 将车次信息写入 Redis 缓存（供后续请求复用）
+        // =========================
+        if (!cache.getTrainMap().isEmpty()) {
+            redisTransportCache.batchPut(new ArrayList<>(cache.getTrainMap().values()));
+        }
+        if (!cache.getFlightMap().isEmpty()) {
+            redisTransportCache.batchPut(new ArrayList<>(cache.getFlightMap().values()));
+        }
+        if (!cache.getBusMap().isEmpty()) {
+            redisTransportCache.batchPut(new ArrayList<>(cache.getBusMap().values()));
         }
 
         // =========================
@@ -396,7 +412,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             vo.setId(order.getId());
             vo.setUserId(order.getUserId());
 
-            // ✅ 使用缓存（关键点🔥）
+            // 鉁?浣跨敤缂撳瓨锛堝叧閿偣馃敟锛?
             User user = userMap.get(order.getUserId());
             if (user != null) {
                 vo.setUsername(user.getUsername());
@@ -405,7 +421,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             vo.setCreateTime(order.getCreateTime());
             vo.setUpdateTime(order.getUpdateTime());
 
-            // 不再查数据库,查缓存信息
+            // 不再查数据库，查缓存信息
             // 根据交通类型采用单策略运行，不在遍历策略运行
             TransportStrategy strategy = strategyManager.get(vo.getTransportType());
             if (strategy != null) {
@@ -430,16 +446,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         return result;
     }
-      //  这个是严重的N+1次查询，严重影响性能，详情见文档N+1次查询
+      // 这个是严重的N+1次查询，严重影响性能，详情见文档N+1次查询
 //    private IPage<OrderUserVO> baseQuery(Page<Order> page, LambdaQueryWrapper<Order> wrapper) {
 //
-//        // 1️⃣ 查数据库
+//        // 1锔忊儯 鏌ユ暟鎹簱
 //        IPage<Order> orderPage = orderMapper.selectPage(page, wrapper);
 //
-//        List<OrderUserVO> voList = new ArrayList<>();//N+1次查询问题的1
+//        List<OrderUserVO> voList = new ArrayList<>();//N+1娆℃煡璇㈤棶棰樼殑1
 //
-//        // 2️⃣ VO转换
-//        for (Order order : orderPage.getRecords()) { //N+1次查询问题的N
+//        // 2锔忊儯 VO杞崲
+//        for (Order order : orderPage.getRecords()) { //N+1娆℃煡璇㈤棶棰樼殑N
 //
 //            OrderUserVO vo = new OrderUserVO();
 //
@@ -459,7 +475,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 //            voList.add(vo);
 //        }
 //
-//        // 3️⃣ 重新封装分页
+//        // 3锔忊儯 閲嶆柊灏佽鍒嗛〉
 //        Page<OrderUserVO> result = new Page<>();
 //        result.setRecords(voList);
 //        result.setTotal(orderPage.getTotal());
@@ -485,7 +501,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 order.getVersion()
         );
         if (rows == 0) {
-            throw new BussinessException("更新失败，可能数据已被修改");
+            throw new BussinessException("Update failed, data may have been modified");
         }
     }
 }
+

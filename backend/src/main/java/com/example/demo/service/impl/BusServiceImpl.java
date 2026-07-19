@@ -18,6 +18,8 @@ import com.example.demo.common.result.ResultCode;
 import com.example.demo.entity.Article;
 import com.example.demo.entity.transport.Bus;
 import com.example.demo.mapper.BusMapper;
+import com.example.demo.common.enums.TransportType;
+import com.example.demo.common.util.RedisTransportCache;
 import com.example.demo.service.BusService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
@@ -32,6 +34,9 @@ public class BusServiceImpl extends ServiceImpl<BusMapper, Bus> implements BusSe
 
     @Resource
     private BusMapper busMapper;
+
+    @Resource
+    private RedisTransportCache redisTransportCache;
 
 
     //=========================公共业务逻辑方法====================================================================
@@ -180,6 +185,8 @@ public class BusServiceImpl extends ServiceImpl<BusMapper, Bus> implements BusSe
         // 系统时间字段和id字段采用后端自动填充，避免前端篡改数据，提高安全性
         BeanUtils.copyProperties(dto, bus, "id", "createTime", "updateTime");
         this.updateById(bus);
+        // 清除 Redis 缓存，下次查订单时自动重新加载
+        redisTransportCache.evict(TransportType.BUS, dto.getId());
     }
 }
 

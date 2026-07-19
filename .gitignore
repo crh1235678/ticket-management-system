@@ -35,3 +35,12 @@ Thumbs.db
 
 # ========== Upload ==========
 uploads/
+
+# ========== Temp Backups ==========
+*.bak
+*.bak2
+*.tmp
+*.py
+out2.txt
+test_read.txt
+fix_log.txt

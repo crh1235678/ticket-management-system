@@ -4,7 +4,7 @@ import com.example.demo.common.exception.BussinessException;
 import com.example.demo.common.result.Result;
 import com.example.demo.common.result.ResultCode;
 import com.example.demo.common.util.Captcha;
-import com.example.demo.common.util.CaptchaCache;
+import com.example.demo.common.util.RedisCaptchaCache;
 import com.example.demo.common.util.UploadFile;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import jakarta.annotation.Resource;
@@ -32,7 +32,7 @@ public class CommonController {
     @Resource
     private DefaultKaptcha defaultKaptcha;
     @Resource
-    private CaptchaCache captchaCache;
+    private RedisCaptchaCache captchaCache;
 
     @Value("${file.server.dir}")
     private String fileDir = "";

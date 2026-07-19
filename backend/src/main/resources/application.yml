@@ -18,6 +18,19 @@ spring:
   application:
     name: demo
 
+  # Redis 配置（Sa-Token 自动读取此配置管理 Token）
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    timeout: 3000
+    # Sa-Token 集成 Redis 需要配置 database（默认0）
+    database: 0
+    lettuce:
+      pool:
+        max-active: 10
+        max-idle: 5
+        min-idle: 1
+
 server:
   port: 8081
   servlet:  #添加统一访问前缀，为了区分项目，我存在多个项目这个是管理员登陆系统项目
@@ -89,8 +102,3 @@ logging:
     com.github.xiaoymin.knife4j: DEBUG
     io.swagger.v3: DEBUG
     org.springdoc: DEBUG
-
-
-
-
-

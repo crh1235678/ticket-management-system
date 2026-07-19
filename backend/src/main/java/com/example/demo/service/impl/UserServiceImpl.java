@@ -13,7 +13,7 @@ import com.example.demo.VO.user.UserMeVo;
 import com.example.demo.VO.user.UserVO;
 import com.example.demo.common.exception.BussinessException;
 import com.example.demo.common.result.ResultCode;
-import com.example.demo.common.util.CaptchaCache;
+import com.example.demo.common.util.RedisCaptchaCache;
 import com.example.demo.common.util.SaTokenUtil;
 import com.example.demo.entity.Article;
 import com.example.demo.entity.Transaction;
@@ -49,7 +49,7 @@ import java.util.List;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
     @Resource
-    private CaptchaCache captchaCache;
+    private RedisCaptchaCache captchaCache;
     @Resource
     private TransactionMapper transactionMapper;
     @Resource

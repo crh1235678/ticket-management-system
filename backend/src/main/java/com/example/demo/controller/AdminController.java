@@ -22,7 +22,7 @@ import com.example.demo.common.exception.BussinessException;
 import com.example.demo.common.result.Result;
 import com.example.demo.common.result.ResultCode;
 import com.example.demo.service.AdminService;
-import com.example.demo.common.util.CaptchaCache;
+import com.example.demo.common.util.RedisCaptchaCache;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -41,7 +41,7 @@ public class AdminController {
     //声明一个 AdminService 类型的引用变量，由 Spring 注入其实现类 AdminServiceImpl 的实例
     private AdminService adminService;
     @Resource
-    private CaptchaCache captchaCache;
+    private RedisCaptchaCache captchaCache;
 
 
     //声明一个 POST 请求接口

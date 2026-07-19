@@ -1,12 +1,14 @@
 package com.example.demo.common.util;
 
-import org.springframework.stereotype.Component;
-
-import java.util.ConcurrentModificationException;
 import java.util.concurrent.ConcurrentHashMap;
 
-
-@Component
+/**
+ * 旧的本地验证码缓存（已废弃，请使用 RedisCaptchaCache）
+ *
+ * 这个类被保留但不注册为 Spring Bean，
+ * 避免和 RedisCaptchaCache 的 Bean 名冲突。
+ * 所有注入 CaptchaCache 的地方已改为 RedisCaptchaCache。
+ */
 public class CaptchaCache {
 
     //验证码缓存
